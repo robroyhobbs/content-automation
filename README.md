@@ -174,6 +174,55 @@ schedule: "0 6 * * 1,4"   # 6 AM Monday & Thursday
 | google-ads | advertising | 6 AM daily | ⏸ Disabled |
 | research | intelligence | Mon/Thu 6 AM | ⏸ Disabled |
 
+## Migrating to a Dedicated Server
+
+For 24/7 reliability, run this on a Linux server instead of your laptop.
+
+### Quick Setup (Ubuntu/Debian)
+
+```bash
+git clone https://github.com/robroyhobbs/content-automation.git
+cd content-automation
+./scripts/setup-linux.sh
+```
+
+The script handles:
+- Node.js 20 installation via nvm
+- Claude CLI setup
+- Cloning docsmith-daily (dependency)
+- Cron job configuration (9 AM daily)
+- Log rotation
+
+### After Setup
+
+```bash
+# Authenticate Claude CLI
+claude
+
+# Test the hub
+npm run status
+npm start
+
+# View dashboard
+npm run dashboard
+```
+
+### Recommended Servers
+
+| Option | Cost | Notes |
+|--------|------|-------|
+| DigitalOcean Droplet | $6-12/mo | Simple, reliable |
+| Raspberry Pi 5 | $80 one-time | Low power, home server |
+| Railway/Render | $5-20/mo | Auto-deploy from GitHub |
+
+## For Claude Code
+
+When adding new tasks, tell Claude:
+
+> "Read ~/content-automation/README.md and create a new task for [description]"
+
+Claude will use the `tasks/_template/` folder and follow the patterns in this README.
+
 ## License
 
 MIT
