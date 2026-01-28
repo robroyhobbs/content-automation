@@ -1,0 +1,100 @@
+# Task Registry - All automated tasks
+#
+# To add a new task:
+# 1. Create folder: tasks/<task-name>/
+# 2. Create task.yaml with task config
+# 3. Create runner.mjs with run() function
+# 4. Add entry here
+#
+# Schedule format: cron expression or keywords (daily, hourly, etc.)
+
+tasks:
+  # ═══════════════════════════════════════════════════════════
+  # CONTENT CREATION
+  # ═══════════════════════════════════════════════════════════
+
+  docsmith:
+    enabled: true
+    category: content-creation
+    description: "Generate documentation for trending GitHub repos"
+    schedule: "0 9 * * *"              # 9 AM daily
+    dailyLimit: 3
+    priority: medium
+
+  daily-blog:
+    enabled: false                      # Enable when ready
+    category: content-creation
+    description: "Research and publish daily blog post"
+    schedule: "0 7 * * *"              # 7 AM daily
+    dailyLimit: 1
+    priority: high
+    dependencies: []                    # Can depend on research
+
+  lead-gen-pages:
+    enabled: false
+    category: content-creation
+    description: "Generate and publish lead generation landing pages"
+    schedule: "0 10 * * 1"             # 10 AM every Monday
+    weeklyLimit: 2
+    priority: high
+
+  # ═══════════════════════════════════════════════════════════
+  # DISTRIBUTION
+  # ═══════════════════════════════════════════════════════════
+
+  social-posts:
+    enabled: false
+    category: distribution
+    description: "Post to Twitter/X and LinkedIn"
+    schedule: "0 8,12,17 * * *"        # 8 AM, 12 PM, 5 PM
+    dailyLimit: 6                       # 2 per time slot
+    platforms:
+      - twitter
+      - linkedin
+    priority: medium
+
+  reddit:
+    enabled: false
+    category: distribution
+    description: "Post valuable content to relevant subreddits"
+    schedule: "0 11,16 * * *"          # 11 AM, 4 PM
+    dailyLimit: 2
+    priority: low
+    # Be careful with Reddit - quality over quantity
+
+  newsletter:
+    enabled: false
+    category: distribution
+    description: "Compile and send weekly newsletter"
+    schedule: "0 8 * * 5"              # 8 AM every Friday
+    weeklyLimit: 1
+    priority: high
+
+  # ═══════════════════════════════════════════════════════════
+  # ADVERTISING
+  # ═══════════════════════════════════════════════════════════
+
+  google-ads:
+    enabled: false
+    category: advertising
+    description: "Optimize Google Ads campaigns"
+    schedule: "0 6 * * *"              # 6 AM daily (before business hours)
+    dailyLimit: 1
+    priority: high
+    # Tasks: bid adjustments, keyword optimization, ad copy testing
+
+  # ═══════════════════════════════════════════════════════════
+  # INTELLIGENCE
+  # ═══════════════════════════════════════════════════════════
+
+  research:
+    enabled: false
+    category: intelligence
+    description: "Research trends, competitors, and content ideas"
+    schedule: "0 6 * * 1,4"            # 6 AM Monday & Thursday
+    weeklyLimit: 2
+    priority: medium
+    outputs:
+      - content-ideas
+      - competitor-analysis
+      - trend-reports

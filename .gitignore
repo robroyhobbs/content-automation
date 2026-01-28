@@ -1,0 +1,37 @@
+# Dependencies
+node_modules/
+
+# Credentials (NEVER commit)
+credentials/*.json
+credentials/*.yaml
+!credentials/.gitkeep
+
+# Logs
+logs/*.log
+!logs/.gitkeep
+
+# Runtime data
+data/state.json
+data/history.json
+!data/.gitkeep
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Task-specific ignores
+tasks/*/workspace/
+tasks/*/output/
+tasks/*/.cache/
+logs/*.json

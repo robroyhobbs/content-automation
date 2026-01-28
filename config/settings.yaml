@@ -1,0 +1,34 @@
+# Content Automation Hub - Global Settings
+version: "1.0"
+
+# Hub configuration
+hub:
+  name: "Content Automation Hub"
+  timezone: "America/Los_Angeles"
+
+# Global limits (can be overridden per task)
+defaults:
+  maxRetries: 2
+  timeoutMinutes: 45
+  cooldownMinutes: 60
+
+# Quality review settings
+qualityReview:
+  enabled: true
+  minScore: 6
+
+# Notifications (optional)
+notifications:
+  enabled: false
+  # slack:
+  #   webhook: "https://hooks.slack.com/..."
+  # email:
+  #   to: "you@example.com"
+
+# Credential paths (relative to credentials/)
+credentials:
+  twitter: "twitter.json"
+  linkedin: "linkedin.json"
+  reddit: "reddit.json"
+  google: "google-ads.json"
+  newsletter: "newsletter.json"

@@ -1,0 +1,44 @@
+# Task Configuration Template
+# Copy this folder and customize for your new task
+#
+# File: tasks/<task-name>/task.yaml
+
+name: my-task-name
+description: "Brief description of what this task does"
+version: "1.0.0"
+
+# Category: content-creation, distribution, advertising, intelligence
+category: content-creation
+
+# Default schedule (can be overridden in config/tasks.yaml)
+schedule: "0 9 * * *"    # Cron format: 9 AM daily
+
+# Limits
+dailyLimit: 3
+weeklyLimit: null        # Optional
+maxRetries: 2
+timeoutMinutes: 30
+
+# Task-specific settings
+settings:
+  # Add your task-specific config here
+  exampleSetting: "value"
+  anotherSetting: 123
+
+# Required credentials (from credentials/ folder)
+credentials: []
+# credentials:
+#   - twitter
+#   - openai
+
+# Dependencies (other tasks that must run first)
+dependencies: []
+# dependencies:
+#   - research
+
+# Output destinations
+outputs:
+  # Where does this task publish to?
+  # - file: ./output/
+  # - api: https://example.com/api
+  # - database: posts

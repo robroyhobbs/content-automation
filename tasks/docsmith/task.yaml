@@ -1,0 +1,51 @@
+# DocSmith Task - Generate documentation for trending GitHub repos
+name: docsmith
+description: "Generate comprehensive documentation for trending GitHub repositories"
+version: "1.0.0"
+category: content-creation
+
+# Schedule: 9 AM daily
+schedule: "0 9 * * *"
+
+# Limits
+dailyLimit: 3
+maxRetries: 2
+timeoutMinutes: 45
+
+# DocSmith-specific settings
+settings:
+  # Source: existing docsmith-daily project
+  projectPath: "/Users/robroyhobbs/docsmith-automation"
+
+  # Repository selection
+  minStars: 100
+  preferredLanguages:
+    - TypeScript
+    - JavaScript
+    - Python
+    - Go
+    - Rust
+
+  # Localization
+  sourceLanguage: zh
+  targetLanguages:
+    - en
+    - ja
+
+  # Publishing
+  publishUrl: "https://docsmith.aigne.io"
+
+  # Quality review
+  qualityReview:
+    enabled: true
+    minScore: 6
+
+# No external credentials needed (uses Claude CLI auth)
+credentials: []
+
+# No dependencies
+dependencies: []
+
+# Outputs
+outputs:
+  - url: "https://docsmith.aigne.io/discuss/docs/{project}"
