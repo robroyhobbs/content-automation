@@ -32,8 +32,8 @@ const taskTable = grid.set(1, 0, 5, 8, contrib.table, {
   keys: true,
   fg: 'white',
   label: ' Task Status ',
-  columnSpacing: 2,
-  columnWidth: [16, 10, 14, 14, 8]
+  columnSpacing: 1,
+  columnWidth: [14, 12, 9, 6, 10]
 });
 
 // Attention Required Box
@@ -83,6 +83,7 @@ const instructionsBox = grid.set(10, 0, 2, 12, blessed.box, {
 
 // Track attention items for interaction
 let attentionItems = [];
+let runningIndicator = 0; // For spinner animation
 
 function formatTimeAgo(isoString) {
   if (!isoString) return 'Never';
@@ -93,6 +94,53 @@ function formatTimeAgo(isoString) {
   const hours = Math.floor(mins / 60);
   if (hours < 24) return `${hours}h ago`;
   return `${Math.floor(hours / 24)}d ago`;
+}
+
+/**
+ * Parse cron expression to human-readable schedule
+ */
+function parseCronToHuman(cron) {
+  if (!cron) return 'Manual';
+
+  const parts = cron.split(' ');
+  if (parts.length < 5) return cron;
+
+  const [min, hour, dayOfMonth, month, dayOfWeek] = parts;
+
+  // Parse time
+  const timeStr = `${hour.padStart(2, '0')}:${min.padStart(2, '0')}`;
+  const hour12 = parseInt(hour) > 12 ? parseInt(hour) - 12 : parseInt(hour);
+  const ampm = parseInt(hour) >= 12 ? 'PM' : 'AM';
+  const friendlyTime = `${hour12}${ampm}`;
+
+  // Parse frequency
+  if (dayOfWeek === '*' && dayOfMonth === '*') {
+    // Multiple times per day?
+    if (hour.includes(',')) {
+      const hours = hour.split(',').map(h => {
+        const h12 = parseInt(h) > 12 ? parseInt(h) - 12 : parseInt(h);
+        return `${h12}${parseInt(h) >= 12 ? 'p' : 'a'}`;
+      });
+      return hours.join('/');
+    }
+    return `Daily ${friendlyTime}`;
+  }
+
+  if (dayOfWeek !== '*') {
+    const days = { '0': 'Sun', '1': 'Mon', '2': 'Tue', '3': 'Wed', '4': 'Thu', '5': 'Fri', '6': 'Sat' };
+    const dayList = dayOfWeek.split(',').map(d => days[d] || d).join('/');
+    return `${dayList} ${friendlyTime}`;
+  }
+
+  return `${friendlyTime}`;
+}
+
+/**
+ * Get running spinner character
+ */
+function getSpinner() {
+  const frames = ['◐', '◓', '◑', '◒'];
+  return frames[runningIndicator % frames.length];
 }
 
 function refreshDashboard() {
@@ -118,17 +166,20 @@ function refreshDashboard() {
 
     if (enabled) totalRemaining += remaining;
 
-    const status = !enabled ? 'Disabled' :
-                   taskState.currentRun ? 'Running' :
-                   taskState.retryCount >= 2 ? 'BLOCKED' :
-                   remaining === 0 ? 'Done' : 'Ready';
+    const isRunning = !!taskState.currentRun;
+    const status = !enabled ? '○ Off' :
+                   isRunning ? `${getSpinner()} RUN` :
+                   taskState.retryCount >= 2 ? '✗ BLOCK' :
+                   remaining === 0 ? '✓ Done' : '● Ready';
+
+    const schedule = parseCronToHuman(regEntry.schedule || task.config?.schedule);
 
     tableData.push([
       task.name,
+      schedule,
       status,
       `${todayCount}/${dailyLimit}`,
-      formatTimeAgo(taskState.lastRun),
-      String(taskState.retryCount || 0)
+      formatTimeAgo(taskState.lastRun)
     ]);
 
     // Check for attention items
@@ -151,7 +202,7 @@ function refreshDashboard() {
 
   // Update task table
   taskTable.setData({
-    headers: ['Task', 'Status', 'Today', 'Last Run', 'Retry'],
+    headers: ['Task', 'Schedule', 'Status', 'Today', 'Last Run'],
     data: tableData
   });
 
@@ -266,7 +317,10 @@ attentionBox.focus();
 // Initial render
 refreshDashboard();
 
-// Auto-refresh every 30 seconds
-setInterval(refreshDashboard, 30000);
+// Refresh every 2 seconds (for running task animation)
+setInterval(() => {
+  runningIndicator++;
+  refreshDashboard();
+}, 2000);
 
 screen.render();
