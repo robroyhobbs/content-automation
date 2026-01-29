@@ -47,7 +47,7 @@ tasks:
 
   # MyVibe Daily - Signup campaign optimization
   google-ads-myvibe-daily:
-    enabled: false  # Enable when account is approved
+    enabled: true  # Campaign created 2026-01-28
     category: advertising
     description: "Daily Google Ads optimization for MyVibe signup campaigns"
     schedule: "15 6 * * *"  # 6:15 AM daily (staggered)
@@ -55,7 +55,7 @@ tasks:
 
   # MyVibe Weekly - Performance review
   google-ads-myvibe-weekly:
-    enabled: false  # Enable when account is approved
+    enabled: true  # Campaign created 2026-01-28
     category: advertising
     description: "Weekly Google Ads review for MyVibe"
     schedule: "30 8 * * 0"  # Sunday 8:30 AM (staggered)
