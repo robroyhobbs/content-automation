@@ -40,6 +40,12 @@ settings:
     autoBidAdjust: false
     suggestNewHeadlines: true
 
+  # GUARDRAILS - Actions requiring human approval
+  guardrails:
+    budgetLimit: 50  # Maximum daily budget ($) that can be set without human approval
+    budgetChangeRequiresApproval: true  # Any budget increase above limit needs explicit approval
+    message: "Budget changes above $50/day require human approval. Never use human_approved=True without explicit user confirmation."
+
   # MyVibe messaging (for headline generation)
   messaging:
     brandVoice: "share-first"
