@@ -7,57 +7,118 @@
 
     <key>ProgramArguments</key>
     <array>
-        <string>/usr/local/bin/node</string>
+        <string>/Users/robroyhobbs/.nvm/versions/node/v24.12.0/bin/node</string>
         <string>/Users/robroyhobbs/content-automation/hub/index.mjs</string>
     </array>
 
     <key>WorkingDirectory</key>
     <string>/Users/robroyhobbs/content-automation</string>
 
+    <!-- Run hourly from 6 AM to 8 PM, every day -->
     <key>StartCalendarInterval</key>
     <array>
-        <!-- Monday 10:00 AM -->
+        <!-- 6 AM -->
         <dict>
-            <key>Weekday</key>
-            <integer>1</integer>
+            <key>Hour</key>
+            <integer>6</integer>
+            <key>Minute</key>
+            <integer>0</integer>
+        </dict>
+        <!-- 7 AM -->
+        <dict>
+            <key>Hour</key>
+            <integer>7</integer>
+            <key>Minute</key>
+            <integer>0</integer>
+        </dict>
+        <!-- 8 AM -->
+        <dict>
+            <key>Hour</key>
+            <integer>8</integer>
+            <key>Minute</key>
+            <integer>0</integer>
+        </dict>
+        <!-- 9 AM -->
+        <dict>
+            <key>Hour</key>
+            <integer>9</integer>
+            <key>Minute</key>
+            <integer>0</integer>
+        </dict>
+        <!-- 10 AM -->
+        <dict>
             <key>Hour</key>
             <integer>10</integer>
             <key>Minute</key>
             <integer>0</integer>
         </dict>
-        <!-- Tuesday 10:00 AM -->
+        <!-- 11 AM -->
         <dict>
-            <key>Weekday</key>
-            <integer>2</integer>
             <key>Hour</key>
-            <integer>10</integer>
+            <integer>11</integer>
             <key>Minute</key>
             <integer>0</integer>
         </dict>
-        <!-- Wednesday 10:00 AM -->
+        <!-- 12 PM -->
         <dict>
-            <key>Weekday</key>
-            <integer>3</integer>
             <key>Hour</key>
-            <integer>10</integer>
+            <integer>12</integer>
             <key>Minute</key>
             <integer>0</integer>
         </dict>
-        <!-- Thursday 10:00 AM -->
+        <!-- 1 PM -->
         <dict>
-            <key>Weekday</key>
-            <integer>4</integer>
             <key>Hour</key>
-            <integer>10</integer>
+            <integer>13</integer>
             <key>Minute</key>
             <integer>0</integer>
         </dict>
-        <!-- Friday 10:00 AM -->
+        <!-- 2 PM -->
         <dict>
-            <key>Weekday</key>
-            <integer>5</integer>
             <key>Hour</key>
-            <integer>10</integer>
+            <integer>14</integer>
+            <key>Minute</key>
+            <integer>0</integer>
+        </dict>
+        <!-- 3 PM -->
+        <dict>
+            <key>Hour</key>
+            <integer>15</integer>
+            <key>Minute</key>
+            <integer>0</integer>
+        </dict>
+        <!-- 4 PM -->
+        <dict>
+            <key>Hour</key>
+            <integer>16</integer>
+            <key>Minute</key>
+            <integer>0</integer>
+        </dict>
+        <!-- 5 PM -->
+        <dict>
+            <key>Hour</key>
+            <integer>17</integer>
+            <key>Minute</key>
+            <integer>0</integer>
+        </dict>
+        <!-- 6 PM -->
+        <dict>
+            <key>Hour</key>
+            <integer>18</integer>
+            <key>Minute</key>
+            <integer>0</integer>
+        </dict>
+        <!-- 7 PM -->
+        <dict>
+            <key>Hour</key>
+            <integer>19</integer>
+            <key>Minute</key>
+            <integer>0</integer>
+        </dict>
+        <!-- 8 PM -->
+        <dict>
+            <key>Hour</key>
+            <integer>20</integer>
             <key>Minute</key>
             <integer>0</integer>
         </dict>
@@ -72,11 +133,12 @@
     <key>EnvironmentVariables</key>
     <dict>
         <key>PATH</key>
-        <string>/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin</string>
+        <string>/Users/robroyhobbs/.nvm/versions/node/v24.12.0/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
         <key>HOME</key>
         <string>/Users/robroyhobbs</string>
     </dict>
 
+    <!-- Don't run immediately on load -->
     <key>RunAtLoad</key>
     <false/>
 </dict>
