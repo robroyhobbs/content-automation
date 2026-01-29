@@ -15,6 +15,7 @@ import { parse as parseYaml } from 'yaml';
 import logger from './shared/logger.mjs';
 import state from './shared/state.mjs';
 import taskLoader from './shared/task-loader.mjs';
+import { recordOutcome } from './shared/learning.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const CONFIG_FILE = join(__dirname, '..', 'config', 'settings.yaml');
@@ -64,13 +65,28 @@ async function runTask(taskName, taskConfig, hubState) {
     };
 
     // Execute the task
+    const startTime = Date.now();
     const result = await runner.run(context);
+    const duration = Date.now() - startTime;
 
     // Mark complete
     state.completeTask(hubState, taskName, result.success, {
       output: result.output,
       url: result.url,
-      duration: Date.now() - new Date(hubState.tasks[taskName]?.lastRun).getTime()
+      duration
+    });
+
+    // Record outcome for learning
+    recordOutcome({
+      task: taskName,
+      success: result.success,
+      duration,
+      output: result.output,
+      url: result.url,
+      context: {
+        category: taskConfig.category,
+        contentType: result.contentType
+      }
     });
 
     logger.info(`Task completed: ${taskName}`, { success: result.success });
@@ -82,6 +98,16 @@ async function runTask(taskName, taskConfig, hubState) {
 
     state.completeTask(hubState, taskName, false, {
       error: error.message
+    });
+
+    // Record failure for learning
+    recordOutcome({
+      task: taskName,
+      success: false,
+      error: error.message,
+      context: {
+        category: taskConfig.category
+      }
     });
 
     return { success: false, error: error.message };

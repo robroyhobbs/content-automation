@@ -28,8 +28,15 @@ const CONFIG = {
   reviewAgeAlertHours: 24,       // Alert if review pending > 24h
   failureRateAlertThreshold: 0.5, // Alert if > 50% failure rate
   maxLogEntries: 500,            // Keep last 500 log entries
-  healthyRunIntervalHours: 6     // Alert if no runs in 6 hours
+  healthyRunIntervalHours: 6,    // Alert if no runs in 6 hours
+  autoRecovery: {
+    enabled: true,               // Enable automatic fixes
+    resetStuckTasks: true,       // Auto-reset tasks stuck > threshold
+    stuckResetThresholdMs: 60 * 60000 // Reset after 60 min (longer than alert threshold)
+  }
 };
+
+const STATE_FILE = join(__dirname, '..', 'data', 'state.json');
 
 /**
  * Overseer state
@@ -124,10 +131,36 @@ function log(type, message, details = {}) {
 }
 
 /**
+ * Auto-recovery: Reset a stuck task
+ */
+function resetStuckTask(taskName) {
+  try {
+    const stateContent = readFileSync(STATE_FILE, 'utf8');
+    const state = JSON.parse(stateContent);
+
+    if (state.tasks?.[taskName]?.currentRun) {
+      delete state.tasks[taskName].currentRun;
+      writeFileSync(STATE_FILE, JSON.stringify(state, null, 2));
+
+      log('action', `Auto-reset stuck task: ${taskName}`, {
+        action: 'reset_stuck_task',
+        task: taskName
+      });
+
+      return true;
+    }
+  } catch (error) {
+    log('error', `Failed to reset task ${taskName}`, { error: error.message });
+  }
+  return false;
+}
+
+/**
  * Check for stuck tasks (running too long)
  */
 function checkStuckTasks(hubState) {
   const issues = [];
+  const actionsPerformed = [];
 
   Object.entries(hubState.tasks || {}).forEach(([taskName, taskState]) => {
     if (taskState.currentRun?.status === 'running') {
@@ -136,11 +169,29 @@ function checkStuckTasks(hubState) {
 
       if (runningTime > CONFIG.stuckTaskThresholdMs) {
         const minutes = Math.round(runningTime / 60000);
+
+        // Check if we should auto-recover
+        if (CONFIG.autoRecovery.enabled &&
+            CONFIG.autoRecovery.resetStuckTasks &&
+            runningTime > CONFIG.autoRecovery.stuckResetThresholdMs) {
+          // Auto-reset the stuck task
+          if (resetStuckTask(taskName)) {
+            actionsPerformed.push({
+              action: 'reset_stuck_task',
+              task: taskName,
+              runningMinutes: minutes
+            });
+            // Don't add to issues since we fixed it
+            return;
+          }
+        }
+
         issues.push({
           task: taskName,
           issue: 'stuck',
           runningMinutes: minutes,
-          startedAt: taskState.currentRun.startedAt
+          startedAt: taskState.currentRun.startedAt,
+          canAutoFix: CONFIG.autoRecovery.enabled
         });
 
         log('alert', `Task "${taskName}" appears stuck`, {
@@ -151,7 +202,7 @@ function checkStuckTasks(hubState) {
     }
   });
 
-  return issues;
+  return { issues, actionsPerformed };
 }
 
 /**
@@ -330,9 +381,13 @@ function performHealthCheck() {
 
   const hubState = loadState();
   const allIssues = [];
+  const allActions = [];
 
-  // Run all checks
-  allIssues.push(...checkStuckTasks(hubState));
+  // Run all checks (some may auto-recover)
+  const stuckResult = checkStuckTasks(hubState);
+  allIssues.push(...stuckResult.issues);
+  allActions.push(...(stuckResult.actionsPerformed || []));
+
   allIssues.push(...checkMissedSchedules(hubState));
   allIssues.push(...checkReviewQueue());
   allIssues.push(...checkSystemHealth(hubState));
@@ -345,9 +400,17 @@ function performHealthCheck() {
   overseerState.checksPerformed++;
   overseerState.status = allIssues.length > 0 ? 'issues_detected' : 'healthy';
   overseerState.currentIssues = allIssues;
+  overseerState.recentActions = allActions;
   overseerState.healthSummary = summary;
+  overseerState.autoRecoveryEnabled = CONFIG.autoRecovery.enabled;
 
   // Log completion
+  if (allActions.length > 0) {
+    log('action', `Auto-recovery: ${allActions.length} action(s) taken`, {
+      actions: allActions
+    });
+  }
+
   if (allIssues.length > 0) {
     log('check', `Health check complete: ${allIssues.length} issue(s) found`, {
       issueCount: allIssues.length
@@ -360,7 +423,7 @@ function performHealthCheck() {
   saveOverseerState();
   saveOverseerLog();
 
-  return { issues: allIssues, summary };
+  return { issues: allIssues, actions: allActions, summary };
 }
 
 /**

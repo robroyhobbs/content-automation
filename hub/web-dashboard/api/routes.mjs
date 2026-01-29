@@ -12,6 +12,11 @@ import {
   rejectReview,
   getReview
 } from '../../shared/reviews.mjs';
+import {
+  loadLearning,
+  generateInsights,
+  getLearningSummary
+} from '../../shared/learning.mjs';
 import { existsSync, readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -386,6 +391,169 @@ router.get('/credentials/status', async (req, res) => {
 });
 
 // ═══════════════════════════════════════════════════════════════
+// GET /api/logs/:type - View logs (hub, overseer, task)
+// ═══════════════════════════════════════════════════════════════
+router.get('/logs/:type', async (req, res) => {
+  try {
+    const { type } = req.params;
+    const lines = parseInt(req.query.lines) || 100;
+    const { readFile } = await import('fs/promises');
+    const { join } = await import('path');
+
+    let logPath;
+    const logsDir = join(__dirname, '..', '..', '..', 'logs');
+    const today = new Date().toISOString().split('T')[0];
+
+    switch (type) {
+      case 'hub':
+        logPath = join(logsDir, `hub-${today}.log`);
+        break;
+      case 'overseer':
+        logPath = join(logsDir, 'overseer-stdout.log');
+        break;
+      case 'launchd':
+        logPath = join(logsDir, 'launchd-stdout.log');
+        break;
+      case 'errors':
+        logPath = join(logsDir, 'launchd-stderr.log');
+        break;
+      default:
+        return res.status(400).json({ error: 'Unknown log type. Use: hub, overseer, launchd, errors' });
+    }
+
+    try {
+      const content = await readFile(logPath, 'utf-8');
+      const allLines = content.trim().split('\n');
+      const recentLines = allLines.slice(-lines);
+
+      res.json({
+        type,
+        path: logPath,
+        lines: recentLines.length,
+        content: recentLines
+      });
+    } catch (err) {
+      if (err.code === 'ENOENT') {
+        return res.json({ type, path: logPath, lines: 0, content: [] });
+      }
+      throw err;
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════
+// POST /api/overseer/fix/:action - Trigger overseer fix action
+// ═══════════════════════════════════════════════════════════════
+router.post('/overseer/fix/:action', async (req, res) => {
+  try {
+    const { action } = req.params;
+    const { taskName } = req.body || {};
+    const state = loadState();
+
+    switch (action) {
+      case 'reset-stuck': {
+        // Reset a stuck task
+        if (!taskName) {
+          return res.status(400).json({ error: 'taskName required' });
+        }
+        if (state.tasks?.[taskName]?.currentRun) {
+          delete state.tasks[taskName].currentRun;
+          const { writeFileSync } = await import('fs');
+          const statePath = join(__dirname, '..', '..', '..', 'data', 'state.json');
+          writeFileSync(statePath, JSON.stringify(state, null, 2));
+
+          res.json({ success: true, message: `Reset stuck task: ${taskName}` });
+        } else {
+          res.json({ success: false, message: 'Task is not stuck' });
+        }
+        break;
+      }
+
+      case 'reset-all-stuck': {
+        // Reset all stuck tasks
+        let resetCount = 0;
+        Object.keys(state.tasks || {}).forEach(name => {
+          if (state.tasks[name]?.currentRun) {
+            delete state.tasks[name].currentRun;
+            resetCount++;
+          }
+        });
+
+        if (resetCount > 0) {
+          const { writeFileSync } = await import('fs');
+          const statePath = join(__dirname, '..', '..', '..', 'data', 'state.json');
+          writeFileSync(statePath, JSON.stringify(state, null, 2));
+        }
+
+        res.json({ success: true, message: `Reset ${resetCount} stuck task(s)` });
+        break;
+      }
+
+      default:
+        res.status(400).json({ error: 'Unknown action. Use: reset-stuck, reset-all-stuck' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════
+// GET /api/task/:name/details - Get detailed task info including recent errors
+// ═══════════════════════════════════════════════════════════════
+router.get('/task/:name/details', async (req, res) => {
+  try {
+    const { name } = req.params;
+    const state = loadState();
+    const history = getHistory(100);
+    const tasks = discoverTasks();
+    const registry = loadTaskRegistry();
+
+    const taskConfig = tasks.find(t => t.name === name);
+    const regEntry = registry[name];
+    const taskState = state.tasks?.[name];
+
+    if (!taskConfig && !taskState) {
+      return res.status(404).json({ error: 'Task not found' });
+    }
+
+    // Get recent history for this task
+    const taskHistory = history
+      .filter(h => h.task === name)
+      .slice(0, 10);
+
+    // Read task-specific logs if they exist
+    let recentLogs = [];
+    try {
+      const { readFile } = await import('fs/promises');
+      const today = new Date().toISOString().split('T')[0];
+      const logPath = join(__dirname, '..', '..', '..', 'logs', `hub-${today}.log`);
+      const content = await readFile(logPath, 'utf-8');
+      const lines = content.split('\n');
+      recentLogs = lines
+        .filter(line => line.includes(name))
+        .slice(-20);
+    } catch (e) {
+      // No logs available
+    }
+
+    res.json({
+      name,
+      config: {
+        ...taskConfig?.config,
+        ...regEntry
+      },
+      state: taskState || {},
+      recentRuns: taskHistory,
+      recentLogs
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════
 // GET /api/schedule/tomorrow - Tomorrow's scheduled tasks
 // ═══════════════════════════════════════════════════════════════
 router.get('/schedule/tomorrow', (req, res) => {
@@ -451,6 +619,63 @@ router.get('/schedule/tomorrow', (req, res) => {
       date: tomorrowStr,
       dayOfWeek: tomorrowDay,
       tasks: scheduled
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════
+// GET /api/learning/summary - Learning loop summary
+// ═══════════════════════════════════════════════════════════════
+router.get('/learning/summary', (req, res) => {
+  try {
+    const summary = getLearningSummary();
+    res.json(summary);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════
+// GET /api/learning/insights - Get insights and recommendations
+// ═══════════════════════════════════════════════════════════════
+router.get('/learning/insights', (req, res) => {
+  try {
+    const { insights, recommendations } = generateInsights();
+    res.json({ insights, recommendations });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════
+// GET /api/learning/patterns - Get detailed patterns
+// ═══════════════════════════════════════════════════════════════
+router.get('/learning/patterns', (req, res) => {
+  try {
+    const data = loadLearning();
+    res.json({
+      taskPatterns: data.taskPatterns,
+      timePatterns: data.timePatterns,
+      errorPatterns: data.errorPatterns
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════
+// POST /api/learning/generate-insights - Force insight generation
+// ═══════════════════════════════════════════════════════════════
+router.post('/learning/generate-insights', (req, res) => {
+  try {
+    const result = generateInsights();
+    res.json({
+      success: true,
+      insightsCount: result.insights.length,
+      recommendationsCount: result.recommendations.length,
+      ...result
     });
   } catch (error) {
     res.status(500).json({ error: error.message });

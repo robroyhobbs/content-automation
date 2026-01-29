@@ -8,6 +8,7 @@ let kanban;
 let activity;
 let stats;
 let overseer;
+let insights;
 let eventStream;
 
 // Current review being viewed
@@ -24,6 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
   activity = new Activity('activity-log');
   stats = new Stats();
   overseer = new Overseer('overseer');
+  insights = new Insights('insights');
 
   // Initial data load
   refreshAll();
@@ -62,7 +64,8 @@ async function refreshAll() {
     kanban.refresh(),
     activity.refresh(),
     stats.refresh(),
-    overseer.refresh()
+    overseer.refresh(),
+    insights.refresh()
   ]);
 }
 
