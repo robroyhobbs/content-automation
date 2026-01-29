@@ -7,19 +7,22 @@ class Kanban {
     this.tasks = [];
     this.reviews = { pending: [], completed: [], rejected: [] };
     this.history = [];
+    this.tomorrowSchedule = null;
   }
 
   async refresh() {
     try {
-      const [tasks, reviews, history] = await Promise.all([
+      const [tasks, reviews, history, tomorrow] = await Promise.all([
         API.getTasks(),
         API.getReviews(),
-        API.getHistory(20)
+        API.getHistory(20),
+        API.getTomorrowSchedule()
       ]);
 
       this.tasks = tasks;
       this.reviews = reviews;
       this.history = history;
+      this.tomorrowSchedule = tomorrow;
       this.render();
     } catch (error) {
       console.error('Failed to load kanban data:', error);
@@ -36,6 +39,7 @@ class Kanban {
   renderScheduled() {
     const container = document.getElementById('list-scheduled');
     const countEl = document.getElementById('count-scheduled');
+    const headerEl = document.querySelector('#col-scheduled .column-title');
     if (!container) return;
 
     // Get tasks that are scheduled but haven't run today
@@ -51,10 +55,29 @@ class Kanban {
       return task.schedule; // Has a schedule
     });
 
+    // If no tasks scheduled today, show tomorrow's schedule
+    if (scheduled.length === 0 && this.tomorrowSchedule?.tasks?.length > 0) {
+      if (headerEl) headerEl.textContent = 'Tomorrow';
+      if (countEl) countEl.textContent = this.tomorrowSchedule.tasks.length;
+
+      container.innerHTML = `
+        <div class="schedule-date">${this.tomorrowSchedule.date}</div>
+        ${this.tomorrowSchedule.tasks.map(task => `
+          <div class="task-card tomorrow" onclick="showTaskDetails('${task.name}')">
+            <div class="task-name">${task.name}</div>
+            <div class="task-meta">${task.time}</div>
+          </div>
+        `).join('')}
+      `;
+      return;
+    }
+
+    // Show today's scheduled tasks
+    if (headerEl) headerEl.textContent = 'Scheduled';
     if (countEl) countEl.textContent = scheduled.length;
 
     if (scheduled.length === 0) {
-      container.innerHTML = '<div class="empty-state">No tasks scheduled</div>';
+      container.innerHTML = '<div class="empty-state">All tasks completed today</div>';
       return;
     }
 

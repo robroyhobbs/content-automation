@@ -12,6 +12,13 @@ import {
   rejectReview,
   getReview
 } from '../../shared/reviews.mjs';
+import { existsSync, readFileSync } from 'node:fs';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const OVERSEER_STATE_FILE = join(__dirname, '..', '..', '..', 'data', 'overseer-state.json');
+const OVERSEER_LOG_FILE = join(__dirname, '..', '..', '..', 'data', 'overseer-log.json');
 
 const router = Router();
 
@@ -273,6 +280,217 @@ router.get('/timeline', (req, res) => {
       date: dateStr,
       hours: Object.values(hourlyData)
     });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════
+// POST /api/publish/:task/:version - Publish approved content
+// ═══════════════════════════════════════════════════════════════
+router.post('/publish/:task/:version', async (req, res) => {
+  try {
+    const { task, version } = req.params;
+
+    // Only arcsphere-social-weekly supports publishing for now
+    if (task !== 'arcsphere-social-weekly') {
+      return res.status(400).json({ error: `Task ${task} does not support publishing` });
+    }
+
+    // Dynamically import the task runner
+    const taskPath = join(__dirname, '..', '..', '..', 'tasks', task, 'runner.mjs');
+    const runner = await import(taskPath);
+
+    if (!runner.publish) {
+      return res.status(400).json({ error: 'Task does not have a publish function' });
+    }
+
+    // Load task config
+    const tasks = discoverTasks();
+    const taskConfig = tasks.find(t => t.name === task);
+
+    if (!taskConfig) {
+      return res.status(404).json({ error: 'Task not found' });
+    }
+
+    // Create context
+    const context = {
+      config: taskConfig.config,
+      logger: {
+        info: (...args) => console.log(`[${task}]`, ...args),
+        warn: (...args) => console.warn(`[${task}]`, ...args),
+        error: (...args) => console.error(`[${task}]`, ...args)
+      }
+    };
+
+    // Execute publish
+    const result = await runner.publish(context, version);
+
+    res.json(result);
+  } catch (error) {
+    console.error('Publish error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════
+// GET /api/drafts/:task/:version - Get draft content for review
+// ═══════════════════════════════════════════════════════════════
+router.get('/drafts/:task/:version', async (req, res) => {
+  try {
+    const { task, version } = req.params;
+
+    if (task !== 'arcsphere-social-weekly') {
+      return res.status(400).json({ error: `Task ${task} does not have drafts` });
+    }
+
+    const draftsDir = join(__dirname, '..', '..', '..', 'campaigns', 'arcsphere-releases', 'drafts', version);
+
+    const { readdir, readFile } = await import('fs/promises');
+
+    const files = await readdir(draftsDir);
+    const drafts = {};
+
+    for (const file of files) {
+      if (file.endsWith('.md')) {
+        const content = await readFile(join(draftsDir, file), 'utf-8');
+        drafts[file.replace('.md', '')] = content;
+      }
+    }
+
+    res.json({
+      version,
+      drafts
+    });
+  } catch (error) {
+    if (error.code === 'ENOENT') {
+      return res.status(404).json({ error: 'Drafts not found for this version' });
+    }
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════
+// GET /api/credentials/status - Check social media credentials
+// ═══════════════════════════════════════════════════════════════
+router.get('/credentials/status', async (req, res) => {
+  try {
+    const posterPath = join(__dirname, '..', '..', 'shared', 'social-poster.mjs');
+    const poster = await import(posterPath);
+
+    const status = await poster.getCredentialStatus();
+    res.json(status);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════
+// GET /api/schedule/tomorrow - Tomorrow's scheduled tasks
+// ═══════════════════════════════════════════════════════════════
+router.get('/schedule/tomorrow', (req, res) => {
+  try {
+    const tasks = discoverTasks();
+    const registry = loadTaskRegistry();
+
+    // Get tomorrow's date
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const tomorrowDay = tomorrow.getDay(); // 0=Sun, 1=Mon, etc.
+    const tomorrowStr = tomorrow.toLocaleDateString('en-US', {
+      weekday: 'long',
+      month: 'short',
+      day: 'numeric'
+    });
+
+    const scheduled = [];
+
+    tasks.forEach(task => {
+      const regEntry = registry[task.name];
+      if (!regEntry || regEntry.enabled === false) return;
+
+      const schedule = regEntry.schedule || task.config?.schedule;
+      if (!schedule) return;
+
+      // Parse cron: "M H * * D" or "M H * * *"
+      const parts = schedule.split(/\s+/);
+      if (parts.length < 5) return;
+
+      const [minute, hour, , , dayOfWeek] = parts;
+
+      // Check if task runs tomorrow
+      let runsOnDay = false;
+      if (dayOfWeek === '*') {
+        runsOnDay = true; // Runs every day
+      } else {
+        const days = dayOfWeek.split(',').map(d => parseInt(d));
+        runsOnDay = days.includes(tomorrowDay);
+      }
+
+      if (runsOnDay) {
+        const h = parseInt(hour);
+        const m = parseInt(minute);
+        const timeStr = `${h > 12 ? h - 12 : h || 12}:${m.toString().padStart(2, '0')} ${h >= 12 ? 'PM' : 'AM'}`;
+
+        scheduled.push({
+          name: task.name,
+          category: regEntry.category || 'general',
+          description: regEntry.description || '',
+          time: timeStr,
+          hour: h,
+          minute: m,
+          schedule
+        });
+      }
+    });
+
+    // Sort by time
+    scheduled.sort((a, b) => (a.hour * 60 + a.minute) - (b.hour * 60 + b.minute));
+
+    res.json({
+      date: tomorrowStr,
+      dayOfWeek: tomorrowDay,
+      tasks: scheduled
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════
+// GET /api/overseer/status - Overseer agent status
+// ═══════════════════════════════════════════════════════════════
+router.get('/overseer/status', (req, res) => {
+  try {
+    if (!existsSync(OVERSEER_STATE_FILE)) {
+      return res.json({
+        status: 'not_running',
+        message: 'Overseer agent has not been started'
+      });
+    }
+
+    const state = JSON.parse(readFileSync(OVERSEER_STATE_FILE, 'utf8'));
+    res.json(state);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════
+// GET /api/overseer/log - Overseer activity log
+// ═══════════════════════════════════════════════════════════════
+router.get('/overseer/log', (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit) || 50;
+
+    if (!existsSync(OVERSEER_LOG_FILE)) {
+      return res.json([]);
+    }
+
+    const log = JSON.parse(readFileSync(OVERSEER_LOG_FILE, 'utf8'));
+    // Return most recent entries first
+    const recent = log.slice(-limit).reverse();
+    res.json(recent);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

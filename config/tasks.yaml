@@ -61,6 +61,19 @@ tasks:
     schedule: "30 8 * * 0"  # Sunday 8:30 AM (staggered)
     dailyLimit: 1
 
+  # ═══════════════════════════════════════════════════════════════
+  # ARCSPHERE SOCIAL CONTENT
+  # ═══════════════════════════════════════════════════════════════
+
+  # ArcSphere Weekly Social - Release content for X + LinkedIn
+  arcsphere-social-weekly:
+    enabled: true  # Created 2026-01-28
+    category: distribution
+    description: "Generate weekly social content for ArcSphere releases (X + LinkedIn, personal + corporate)"
+    schedule: "0 18 * * 2"  # Tuesday 10 AM PST (18:00 UTC)
+    dailyLimit: 1
+    weeklyLimit: 1
+
   # Future tasks (disabled for now)
   # social-posts:
   #   enabled: false

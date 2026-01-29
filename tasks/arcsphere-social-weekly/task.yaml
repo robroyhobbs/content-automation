@@ -1,0 +1,78 @@
+name: arcsphere-social-weekly
+description: "Generate weekly social media content for ArcSphere releases"
+version: "1.0.0"
+
+category: distribution
+
+# Schedule: Tuesday 10:00 AM PST (18:00 UTC)
+schedule: "0 18 * * 2"
+
+dailyLimit: 1
+weeklyLimit: 1
+maxRetries: 1
+timeoutMinutes: 30
+
+settings:
+  # Input/output paths (relative to content-automation root)
+  incomingPath: "./campaigns/arcsphere-releases/incoming"
+  completedPath: "./campaigns/arcsphere-releases/completed"
+  draftsPath: "./campaigns/arcsphere-releases/drafts"
+
+  # Social accounts configuration
+  accounts:
+    x:
+      personal:
+        enabled: true
+        handle: "@robroyhobbs"
+        tone: "enthusiastic, authentic, technical, first-person"
+      arcblock:
+        enabled: true
+        handle: "@ArcBlock_io"
+        accessType: "delegate"
+        tone: "professional, informative, brand-aligned"
+    linkedin:
+      personal:
+        enabled: true
+        tone: "thought leadership, personal experience, industry insight"
+      arcblock:
+        enabled: true
+        accessType: "admin"
+        tone: "company announcement, professional, feature-focused"
+
+  # Content generation settings
+  contentSettings:
+    includeVideo: true
+    includeHashtags: true
+    maxHashtags: 5
+    defaultHashtags:
+      - "#ArcSphere"
+      - "#AI"
+      - "#ProductUpdate"
+    videoFormats:
+      x: "mp4, max 2:20, vertical or square preferred"
+      linkedin: "mp4, max 10 min, horizontal or square preferred"
+
+  # Review workflow
+  requiresReview: true
+  autoPublish: false
+
+  # Brand guidelines
+  brand:
+    product: "ArcSphere"
+    tagline: "Your real-time window into the AI-enabled internet"
+    keyMessages:
+      - "AI browser for discovery"
+      - "Agent Fleet access"
+      - "Smart browsing"
+    avoidTerms:
+      - "blockchain"
+      - "crypto"
+      - "Web3"
+
+credentials: []
+
+dependencies: []
+
+outputs:
+  review: true
+  file: "./campaigns/arcsphere-releases/drafts/"

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.robroyhobbs.content-automation-overseer</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/robroyhobbs/.nvm/versions/node/v24.12.0/bin/node</string>
+        <string>/Users/robroyhobbs/content-automation/hub/overseer.mjs</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/robroyhobbs/content-automation</string>
+
+    <!-- Keep running always -->
+    <key>KeepAlive</key>
+    <true/>
+
+    <!-- Start when loaded -->
+    <key>RunAtLoad</key>
+    <true/>
+
+    <!-- Restart if it crashes (wait 10 seconds) -->
+    <key>ThrottleInterval</key>
+    <integer>10</integer>
+
+    <key>StandardOutPath</key>
+    <string>/Users/robroyhobbs/content-automation/logs/overseer-stdout.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/Users/robroyhobbs/content-automation/logs/overseer-stderr.log</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/Users/robroyhobbs/.nvm/versions/node/v24.12.0/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+        <key>HOME</key>
+        <string>/Users/robroyhobbs</string>
+    </dict>
+</dict>
+</plist>

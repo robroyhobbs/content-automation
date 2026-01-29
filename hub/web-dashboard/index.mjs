@@ -57,7 +57,7 @@ function broadcastStateChange(type = 'state-change') {
 }
 
 // Watch data files for changes
-const filesToWatch = ['state.json', 'history.json', 'reviews.json'];
+const filesToWatch = ['state.json', 'history.json', 'reviews.json', 'overseer-state.json', 'overseer-log.json'];
 
 filesToWatch.forEach(filename => {
   const filepath = join(DATA_DIR, filename);

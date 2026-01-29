@@ -7,6 +7,7 @@ let timeline;
 let kanban;
 let activity;
 let stats;
+let overseer;
 let eventStream;
 
 // Current review being viewed
@@ -22,6 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
   kanban = new Kanban();
   activity = new Activity('activity-log');
   stats = new Stats();
+  overseer = new Overseer('overseer');
 
   // Initial data load
   refreshAll();
@@ -59,7 +61,8 @@ async function refreshAll() {
     timeline.refresh(),
     kanban.refresh(),
     activity.refresh(),
-    stats.refresh()
+    stats.refresh(),
+    overseer.refresh()
   ]);
 }
 
@@ -87,6 +90,11 @@ function handleServerEvent(event) {
     case 'reviews-change':
       kanban.refresh();
       stats.refresh();
+      break;
+
+    case 'overseer-state-change':
+    case 'overseer-log-change':
+      overseer.refresh();
       break;
 
     default:

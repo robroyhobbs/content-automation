@@ -77,6 +77,20 @@ const API = {
 
   rejectReview(id, reason = '') {
     return this.post(`/reviews/${id}/reject`, { reason });
+  },
+
+  // Overseer endpoints
+  getOverseerStatus() {
+    return this.get('/overseer/status');
+  },
+
+  getOverseerLog(limit = 50) {
+    return this.get(`/overseer/log?limit=${limit}`);
+  },
+
+  // Schedule endpoints
+  getTomorrowSchedule() {
+    return this.get('/schedule/tomorrow');
   }
 };
 
