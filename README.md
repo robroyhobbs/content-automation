@@ -167,7 +167,7 @@ schedule: "0 6 * * 1,4"   # 6 AM Monday & Thursday
 | Task | Category | Schedule | Status |
 |------|----------|----------|--------|
 | docsmith | content-creation | 9 AM daily | ✅ Enabled |
-| daily-blog | content-creation | 7 AM daily | ⏸ Disabled |
+| daily-blog | content-creation | 7 AM daily | ✅ Enabled |
 | social-posts | distribution | 8AM/12PM/5PM | ⏸ Disabled |
 | reddit | distribution | 11AM/4PM | ⏸ Disabled |
 | newsletter | distribution | Fri 8 AM | ⏸ Disabled |

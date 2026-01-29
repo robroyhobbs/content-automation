@@ -1,0 +1,71 @@
+# Google Ads Daily Optimization Task - ArcSphere
+# Runs daily to review campaign performance and make optimizations
+
+name: google-ads-arcsphere-daily
+description: "Daily Google Ads campaign review and optimization for ArcSphere"
+version: "1.0.0"
+
+category: advertising
+
+# Run at 6 AM daily (before peak hours)
+schedule: "0 6 * * *"
+
+# Limits
+dailyLimit: 1
+maxRetries: 2
+timeoutMinutes: 30
+
+# Task-specific settings
+settings:
+  # Google Ads account details
+  customerId: "9462287380"  # ArcSphere account
+
+  # Campaign configuration
+  campaign:
+    name: "ArcSphere App Promotion"
+    dailyBudget: 30  # Combined budget across campaigns
+    targetCPA: 0.50  # Target per install (app campaigns are efficient)
+
+  # Performance thresholds
+  thresholds:
+    minClicksBeforePause: 200
+    minCTR: 0.5
+    maxCPC: 0.50
+    minImpressions: 500
+
+  # Optimization settings
+  optimization:
+    mode: "conservative"
+    autoPause: false
+    autoBidAdjust: false
+    suggestNewHeadlines: true
+
+  # ArcSphere messaging
+  messaging:
+    brandVoice: "discovery-first"
+    primaryBenefit: "AI-powered browsing"
+    targetAudience: "mobile users, AI enthusiasts"
+    doNotUse:
+      - "boring"
+      - "old browser"
+    preferredTerms:
+      - "AI browser"
+      - "discover"
+      - "explore"
+      - "smart browsing"
+
+  # MCP server configuration
+  mcpServer:
+    path: "/Users/robroyhobbs/work/google-ads-automation/mcp-server"
+    pythonPath: "/Users/robroyhobbs/work/google-ads-automation/mcp-server/.venv/bin/python3"
+
+# Required credentials
+credentials: []
+
+# Dependencies
+dependencies: []
+
+# Output destinations
+outputs:
+  reports: "./reports/google-ads/arcsphere/"
+  logs: "./logs/"

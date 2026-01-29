@@ -1,100 +1,91 @@
-# Task Registry - All automated tasks
+# Task Registry
+# Controls which tasks are enabled and their schedule overrides
 #
-# To add a new task:
-# 1. Create folder: tasks/<task-name>/
-# 2. Create task.yaml with task config
-# 3. Create runner.mjs with run() function
-# 4. Add entry here
-#
-# Schedule format: cron expression or keywords (daily, hourly, etc.)
+# Tasks are auto-discovered from tasks/ folder, but this file
+# allows you to enable/disable and override settings.
 
 tasks:
-  # ═══════════════════════════════════════════════════════════
-  # CONTENT CREATION
-  # ═══════════════════════════════════════════════════════════
-
+  # DocSmith - Documentation generation for trending repos
   docsmith:
     enabled: true
     category: content-creation
-    description: "Generate documentation for trending GitHub repos"
-    schedule: "0 9 * * *"              # 9 AM daily
+    description: "Generate documentation for trending GitHub repositories"
+    schedule: "0 9 * * *"  # 9 AM daily
     dailyLimit: 3
-    priority: medium
 
+  # Daily Blog - ArcBlock blog automation
   daily-blog:
-    enabled: false                      # Enable when ready
+    enabled: true
     category: content-creation
-    description: "Research and publish daily blog post"
-    schedule: "0 7 * * *"              # 7 AM daily
+    description: "Generate daily SEO-optimized blog posts for arcblock.io"
+    schedule: "0 7 * * *"  # 7 AM daily
     dailyLimit: 1
-    priority: high
-    dependencies: []                    # Can depend on research
 
-  lead-gen-pages:
-    enabled: false
-    category: content-creation
-    description: "Generate and publish lead generation landing pages"
-    schedule: "0 10 * * 1"             # 10 AM every Monday
-    weeklyLimit: 2
-    priority: high
+  # ═══════════════════════════════════════════════════════════════
+  # ARCSPHERE GOOGLE ADS
+  # ═══════════════════════════════════════════════════════════════
 
-  # ═══════════════════════════════════════════════════════════
-  # DISTRIBUTION
-  # ═══════════════════════════════════════════════════════════
-
-  social-posts:
-    enabled: false
-    category: distribution
-    description: "Post to Twitter/X and LinkedIn"
-    schedule: "0 8,12,17 * * *"        # 8 AM, 12 PM, 5 PM
-    dailyLimit: 6                       # 2 per time slot
-    platforms:
-      - twitter
-      - linkedin
-    priority: medium
-
-  reddit:
-    enabled: false
-    category: distribution
-    description: "Post valuable content to relevant subreddits"
-    schedule: "0 11,16 * * *"          # 11 AM, 4 PM
-    dailyLimit: 2
-    priority: low
-    # Be careful with Reddit - quality over quantity
-
-  newsletter:
-    enabled: false
-    category: distribution
-    description: "Compile and send weekly newsletter"
-    schedule: "0 8 * * 5"              # 8 AM every Friday
-    weeklyLimit: 1
-    priority: high
-
-  # ═══════════════════════════════════════════════════════════
-  # ADVERTISING
-  # ═══════════════════════════════════════════════════════════
-
-  google-ads:
-    enabled: false
+  # ArcSphere Daily - App promotion optimization
+  google-ads-arcsphere-daily:
+    enabled: true
     category: advertising
-    description: "Optimize Google Ads campaigns"
-    schedule: "0 6 * * *"              # 6 AM daily (before business hours)
+    description: "Daily Google Ads optimization for ArcSphere app campaigns"
+    schedule: "0 6 * * *"  # 6 AM daily
     dailyLimit: 1
-    priority: high
-    # Tasks: bid adjustments, keyword optimization, ad copy testing
 
-  # ═══════════════════════════════════════════════════════════
-  # INTELLIGENCE
-  # ═══════════════════════════════════════════════════════════
+  # ArcSphere Weekly - Performance review
+  google-ads-arcsphere-weekly:
+    enabled: true
+    category: advertising
+    description: "Weekly Google Ads review for ArcSphere"
+    schedule: "0 8 * * 0"  # Sunday 8 AM
+    dailyLimit: 1
 
-  research:
-    enabled: false
-    category: intelligence
-    description: "Research trends, competitors, and content ideas"
-    schedule: "0 6 * * 1,4"            # 6 AM Monday & Thursday
-    weeklyLimit: 2
-    priority: medium
-    outputs:
-      - content-ideas
-      - competitor-analysis
-      - trend-reports
+  # ═══════════════════════════════════════════════════════════════
+  # MYVIBE GOOGLE ADS
+  # ═══════════════════════════════════════════════════════════════
+
+  # MyVibe Daily - Signup campaign optimization
+  google-ads-myvibe-daily:
+    enabled: false  # Enable when account is approved
+    category: advertising
+    description: "Daily Google Ads optimization for MyVibe signup campaigns"
+    schedule: "15 6 * * *"  # 6:15 AM daily (staggered)
+    dailyLimit: 1
+
+  # MyVibe Weekly - Performance review
+  google-ads-myvibe-weekly:
+    enabled: false  # Enable when account is approved
+    category: advertising
+    description: "Weekly Google Ads review for MyVibe"
+    schedule: "30 8 * * 0"  # Sunday 8:30 AM (staggered)
+    dailyLimit: 1
+
+  # Future tasks (disabled for now)
+  # social-posts:
+  #   enabled: false
+  #   category: distribution
+  #   description: "Distribute content to social media"
+  #   schedule: "0 8,12,17 * * *"
+  #   dailyLimit: 9
+
+  # reddit:
+  #   enabled: false
+  #   category: distribution
+  #   description: "Post to relevant Reddit communities"
+  #   schedule: "0 11,16 * * *"
+  #   dailyLimit: 2
+
+  # newsletter:
+  #   enabled: false
+  #   category: distribution
+  #   description: "Weekly newsletter compilation"
+  #   schedule: "0 8 * * 5"  # Friday 8 AM
+  #   dailyLimit: 1
+
+  # research:
+  #   enabled: false
+  #   category: intelligence
+  #   description: "Trend research and competitor analysis"
+  #   schedule: "0 6 * * 1,4"  # Mon/Thu 6 AM
+  #   dailyLimit: 1

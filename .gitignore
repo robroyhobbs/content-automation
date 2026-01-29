@@ -11,9 +11,14 @@ logs/*.log
 !logs/.gitkeep
 
 # Runtime data
-data/state.json
-data/history.json
+data/
 !data/.gitkeep
+
+# Generated reports
+reports/
+
+# Campaign data
+campaigns/
 
 # Environment
 .env

@@ -1,0 +1,108 @@
+# Daily ArcBlock Blog Task
+# Generates one blog post per day for arcblock.io/blog
+# Never repeats the same product 2 days in a row
+
+name: daily-blog
+description: "Generate daily ArcBlock blog posts with SEO optimization and visual content"
+version: "1.0.0"
+category: content-creation
+
+# Schedule: 10 AM PST weekdays only (Mon-Fri)
+# Cron: minute hour day-of-month month day-of-week (0=Sun, 1-5=Mon-Fri)
+schedule: "0 10 * * 1-5"
+timezone: "America/Los_Angeles"
+
+# Limits
+dailyLimit: 1
+maxRetries: 2
+timeoutMinutes: 60
+
+# Blog automation settings
+settings:
+  # ArcBlock blog URL
+  blogUrl: "https://www.arcblock.io/blog/blog/new"
+
+  # Products to rotate between (never same 2 days in a row)
+  products:
+    - name: "AIGNE"
+      tags: ["AIGNE", "AI Agents", "Framework"]
+      keywords: ["AIGNE framework", "AI agent development", "typescript AI agents"]
+      description: "Framework for building AI-native apps with agents"
+
+    - name: "MyVibe"
+      tags: ["MyVibe", "Deployment", "Vibe Coding"]
+      keywords: ["vibe coding deployment", "AI web app hosting", "MyVibe publish"]
+      description: "Platform for deploying vibe-coded creations"
+
+    - name: "ArcBlock"
+      tags: ["ArcBlock", "Blockchain", "DID"]
+      keywords: ["ArcBlock blockchain", "decentralized identity", "DID technology"]
+      description: "The comprehensive ArcBlock platform and ecosystem"
+
+    - name: "ArcSphere"
+      tags: ["ArcSphere", "AI Agents", "Publishing"]
+      keywords: ["ArcSphere agents", "AI publishing", "agent marketplace"]
+      description: "Platform for AI agent discovery and deployment"
+
+  # Content types with weights
+  contentTypes:
+    - type: "news"
+      weight: 25
+      description: "Current tech/AI news connected to ArcBlock products"
+      template: "news-article"
+
+    - type: "feature"
+      weight: 25
+      description: "New product features and changelog announcements"
+      template: "feature-announcement"
+
+    - type: "opinion"
+      weight: 25
+      description: "Thought leadership from Rob's perspective"
+      template: "opinion-piece"
+
+    - type: "how-to"
+      weight: 25
+      description: "Step-by-step tutorials and guides"
+      template: "how-to-guide"
+
+  # SEO settings
+  seo:
+    targetWordCount: 1500
+    minWordCount: 1000
+    maxWordCount: 2500
+    killWords:
+      - "delve"
+      - "comprehensive"
+      - "leverage"
+      - "cutting-edge"
+      - "game-changing"
+      - "revolutionary"
+      - "seamlessly"
+      - "robust"
+
+  # Visual content
+  visuals:
+    heroImage: true
+    diagrams: true
+    preferMermaid: true
+
+  # Claude Code skills to use
+  skills:
+    context: "arcblock-context"
+    research: "keyword-research"
+    content: "seo-content"
+    copy: "direct-response-copy"
+
+# State file for tracking rotation
+stateFile: "data/daily-blog-state.json"
+
+# No external credentials needed (uses Claude CLI auth)
+credentials: []
+
+# No dependencies
+dependencies: []
+
+# Outputs
+outputs:
+  - url: "https://www.arcblock.io/blog/{slug}"

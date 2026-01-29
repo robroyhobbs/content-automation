@@ -1,0 +1,71 @@
+# Google Ads Weekly Review Task - MyVibe
+# Comprehensive weekly analysis with strategy recommendations
+
+name: google-ads-myvibe-weekly
+description: "Weekly Google Ads performance review and strategy analysis for MyVibe"
+version: "1.0.0"
+
+category: advertising
+
+# Run Sunday at 8:30 AM (staggered from ArcSphere)
+schedule: "30 8 * * 0"
+
+# Limits
+dailyLimit: 1
+weeklyLimit: 1
+maxRetries: 2
+timeoutMinutes: 45
+
+# Task-specific settings
+settings:
+  # Google Ads account details
+  customerId: "1749226866"  # MyVibe account (174-922-6866)
+
+  # Review period
+  reviewPeriod: 7  # days
+
+  # Campaign goals
+  goals:
+    targetCPA: 2.00        # $2 per signup
+    targetROAS: null
+    weeklyBudget: 350      # $50/day * 7 days
+    minConversions: 175    # Target at $2 CPA
+
+  # Analysis dimensions
+  analysis:
+    - campaignPerformance
+    - adGroupPerformance
+    - adCreativePerformance
+    - keywordPerformance
+    - deviceBreakdown
+    - dayOfWeekAnalysis
+    - imageAssetAnalysis
+
+  # Thresholds for recommendations
+  thresholds:
+    significantSpendChange: 20
+    significantCPAChange: 25
+
+  # Report configuration
+  report:
+    format: "markdown"
+    includeCharts: false
+    includePriorWeekComparison: true
+    includeRecommendations: true
+
+  # MCP server configuration
+  mcpServer:
+    path: "/Users/robroyhobbs/work/google-ads-automation/mcp-server"
+    pythonPath: "/Users/robroyhobbs/work/google-ads-automation/mcp-server/.venv/bin/python3"
+
+# Required credentials
+credentials: []
+
+# Dependencies
+dependencies:
+  - google-ads-myvibe-daily
+
+# Output destinations
+outputs:
+  reports: "./reports/google-ads/myvibe/"
+  logs: "./logs/"

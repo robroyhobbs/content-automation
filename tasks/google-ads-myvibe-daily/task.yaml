@@ -1,0 +1,73 @@
+# Google Ads Daily Optimization Task - MyVibe
+# Runs daily to review campaign performance and make optimizations
+
+name: google-ads-myvibe-daily
+description: "Daily Google Ads campaign review and optimization for MyVibe"
+version: "1.0.0"
+
+category: advertising
+
+# Run at 6:15 AM daily (staggered from ArcSphere)
+schedule: "15 6 * * *"
+
+# Limits
+dailyLimit: 1
+maxRetries: 2
+timeoutMinutes: 30
+
+# Task-specific settings
+settings:
+  # Google Ads account details
+  customerId: "1749226866"  # MyVibe account (174-922-6866)
+
+  # Campaign configuration
+  campaign:
+    name: "MyVibe Signups"
+    dailyBudget: 50  # $50/day
+    targetCPA: 2.00  # Target $2 per signup
+
+  # Performance thresholds (conservative approach)
+  thresholds:
+    minClicksBeforePause: 150
+    minCTR: 0.5
+    maxCPC: 1.50
+    minImpressions: 100
+
+  # Optimization settings
+  optimization:
+    mode: "conservative"
+    autoPause: false
+    autoBidAdjust: false
+    suggestNewHeadlines: true
+
+  # MyVibe messaging (for headline generation)
+  messaging:
+    brandVoice: "share-first"
+    primaryBenefit: "instant sharing"
+    targetAudience: "AI creators, vibe coders, non-technical founders"
+    doNotUse:
+      - "deploy"
+      - "ship"
+      - "easy"
+      - "simple"
+    preferredTerms:
+      - "share"
+      - "publish"
+      - "live in seconds"
+      - "vibe"
+
+  # MCP server configuration
+  mcpServer:
+    path: "/Users/robroyhobbs/work/google-ads-automation/mcp-server"
+    pythonPath: "/Users/robroyhobbs/work/google-ads-automation/mcp-server/.venv/bin/python3"
+
+# Required credentials
+credentials: []
+
+# Dependencies
+dependencies: []
+
+# Output destinations
+outputs:
+  reports: "./reports/google-ads/myvibe/"
+  logs: "./logs/"

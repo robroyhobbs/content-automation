@@ -14,7 +14,22 @@
     "list-tasks": "node hub/cli.mjs list",
     "status": "node hub/cli.mjs status",
     "install-scheduler": "./scripts/install.sh",
-    "add-task": "node hub/cli.mjs add-task"
+    "add-task": "node hub/cli.mjs add-task",
+    "setup-blog-automation": "node tasks/daily-blog/setup.mjs",
+    "check-blog-session": "node tasks/daily-blog/check-session.mjs",
+    "generate-blog": "node tasks/daily-blog/generate-blog.mjs",
+    "generate-blog:aigne": "node tasks/daily-blog/generate-blog.mjs AIGNE",
+    "generate-blog:myvibe": "node tasks/daily-blog/generate-blog.mjs MyVibe",
+    "generate-blog:arcblock": "node tasks/daily-blog/generate-blog.mjs ArcBlock",
+    "generate-blog:arcsphere": "node tasks/daily-blog/generate-blog.mjs ArcSphere",
+    "reviews": "node hub/review-cli.mjs",
+    "reviews:list": "node hub/review-cli.mjs list",
+    "reviews:view": "node hub/review-cli.mjs view",
+    "reviews:approve": "node hub/review-cli.mjs approve",
+    "reviews:reject": "node hub/review-cli.mjs reject",
+    "schedule": "node hub/schedule-cli.mjs",
+    "install-scheduler": "./scripts/install-macos.sh",
+    "uninstall-scheduler": "launchctl unload ~/Library/LaunchAgents/com.robroyhobbs.content-automation.plist && rm ~/Library/LaunchAgents/com.robroyhobbs.content-automation.plist"
   },
   "dependencies": {
     "blessed": "^0.1.81",
@@ -22,8 +37,9 @@
     "chalk": "^5.3.0",
     "croner": "^8.0.0",
     "fs-extra": "^11.2.0",
-    "yaml": "^2.3.4",
+    "playwright": "^1.58.0",
     "winston": "^3.11.0",
-    "winston-daily-rotate-file": "^5.0.0"
+    "winston-daily-rotate-file": "^5.0.0",
+    "yaml": "^2.3.4"
   }
 }

@@ -1,0 +1,69 @@
+# Google Ads Weekly Review Task - ArcSphere
+# Comprehensive weekly analysis with strategy recommendations
+
+name: google-ads-arcsphere-weekly
+description: "Weekly Google Ads performance review and strategy analysis for ArcSphere"
+version: "1.0.0"
+
+category: advertising
+
+# Run Sunday at 8 AM
+schedule: "0 8 * * 0"
+
+# Limits
+dailyLimit: 1
+weeklyLimit: 1
+maxRetries: 2
+timeoutMinutes: 45
+
+# Task-specific settings
+settings:
+  # Google Ads account details
+  customerId: "9462287380"  # ArcSphere account
+
+  # Review period
+  reviewPeriod: 7  # days
+
+  # Campaign goals
+  goals:
+    targetCPA: 0.50        # $0.50 per install
+    targetROAS: null
+    weeklyBudget: 210      # ~$30/day * 7 days
+    minConversions: 420    # Target at $0.50 CPA
+
+  # Analysis dimensions
+  analysis:
+    - campaignPerformance
+    - adGroupPerformance
+    - adCreativePerformance
+    - deviceBreakdown
+    - dayOfWeekAnalysis
+
+  # Thresholds for recommendations
+  thresholds:
+    significantSpendChange: 20
+    significantCPAChange: 25
+
+  # Report configuration
+  report:
+    format: "markdown"
+    includeCharts: false
+    includePriorWeekComparison: true
+    includeRecommendations: true
+
+  # MCP server configuration
+  mcpServer:
+    path: "/Users/robroyhobbs/work/google-ads-automation/mcp-server"
+    pythonPath: "/Users/robroyhobbs/work/google-ads-automation/mcp-server/.venv/bin/python3"
+
+# Required credentials
+credentials: []
+
+# Dependencies
+dependencies:
+  - google-ads-arcsphere-daily
+
+# Output destinations
+outputs:
+  reports: "./reports/google-ads/arcsphere/"
+  logs: "./logs/"
