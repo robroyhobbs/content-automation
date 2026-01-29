@@ -29,9 +29,12 @@
     "reviews:reject": "node hub/review-cli.mjs reject",
     "schedule": "node hub/schedule-cli.mjs",
     "install-scheduler": "./scripts/install-macos.sh",
-    "uninstall-scheduler": "launchctl unload ~/Library/LaunchAgents/com.robroyhobbs.content-automation.plist && rm ~/Library/LaunchAgents/com.robroyhobbs.content-automation.plist"
+    "uninstall-scheduler": "launchctl unload ~/Library/LaunchAgents/com.robroyhobbs.content-automation.plist && rm ~/Library/LaunchAgents/com.robroyhobbs.content-automation.plist",
+    "web": "node hub/web-dashboard/index.mjs",
+    "web:dev": "node --watch hub/web-dashboard/index.mjs"
   },
   "dependencies": {
+    "express": "^4.18.2",
     "blessed": "^0.1.81",
     "blessed-contrib": "^4.11.0",
     "chalk": "^5.3.0",
