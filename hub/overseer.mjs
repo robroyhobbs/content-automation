@@ -15,6 +15,7 @@ import logger from './shared/logger.mjs';
 import { loadState, getHistory } from './shared/state.mjs';
 import { discoverTasks, loadTaskRegistry } from './shared/task-loader.mjs';
 import { getPendingReviews } from './shared/reviews.mjs';
+import { runOptimization } from './shared/data-optimizer.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const OVERSEER_LOG_FILE = join(__dirname, '..', 'data', 'overseer-log.json');
@@ -33,6 +34,10 @@ const CONFIG = {
     enabled: true,               // Enable automatic fixes
     resetStuckTasks: true,       // Auto-reset tasks stuck > threshold
     stuckResetThresholdMs: 60 * 60000 // Reset after 60 min (longer than alert threshold)
+  },
+  dataOptimization: {
+    enabled: true,               // Enable automatic data optimization
+    runEveryNChecks: 60          // Run optimization every 60 checks (~1 hour)
   }
 };
 
@@ -417,6 +422,23 @@ function performHealthCheck() {
     });
   } else {
     log('check', 'Health check complete: All systems healthy', summary);
+  }
+
+  // Run data optimization periodically
+  if (CONFIG.dataOptimization.enabled &&
+      overseerState.checksPerformed % CONFIG.dataOptimization.runEveryNChecks === 0) {
+    try {
+      const optimizationResult = runOptimization();
+      if (optimizationResult.totalSavedBytes > 0) {
+        log('action', `Data optimized: saved ${optimizationResult.totalSavedKB}KB`, {
+          action: 'data_optimization',
+          ...optimizationResult
+        });
+      }
+      overseerState.lastOptimization = optimizationResult;
+    } catch (error) {
+      log('error', 'Data optimization failed', { error: error.message });
+    }
   }
 
   // Persist state and log

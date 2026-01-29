@@ -17,6 +17,10 @@ import {
   generateInsights,
   getLearningSummary
 } from '../../shared/learning.mjs';
+import {
+  runOptimization,
+  getStorageStats
+} from '../../shared/data-optimizer.mjs';
 import { existsSync, readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -675,6 +679,33 @@ router.post('/learning/generate-insights', (req, res) => {
       success: true,
       insightsCount: result.insights.length,
       recommendationsCount: result.recommendations.length,
+      ...result
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════
+// GET /api/storage/stats - Get storage statistics
+// ═══════════════════════════════════════════════════════════════
+router.get('/storage/stats', (req, res) => {
+  try {
+    const stats = getStorageStats();
+    res.json(stats);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════
+// POST /api/storage/optimize - Run data optimization manually
+// ═══════════════════════════════════════════════════════════════
+router.post('/storage/optimize', (req, res) => {
+  try {
+    const result = runOptimization();
+    res.json({
+      success: true,
       ...result
     });
   } catch (error) {
