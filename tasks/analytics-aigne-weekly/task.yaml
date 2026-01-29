@@ -1,0 +1,119 @@
+# Google Analytics Weekly Report - AIGNE
+# Generates comprehensive analytics dashboard with SEO/organic focus
+# Every Thursday at 7:15am PST
+
+name: analytics-aigne-weekly
+description: "Weekly Google Analytics report for AIGNE - focus on organic/search growth from content strategy"
+version: "2.0.0"
+
+category: analytics
+
+# Run Thursday at 7:15 AM PST (staggered from ArcSphere)
+schedule: "15 7 * * 4"
+
+# Limits
+dailyLimit: 1
+weeklyLimit: 1
+maxRetries: 2
+timeoutMinutes: 30
+
+# Task-specific settings
+settings:
+  # Google Analytics property
+  propertyId: "463555944"
+  propertyName: "AIGNE"
+
+  # Product Context (from CLAUDE.md)
+  # Note: This tracks docsmith.aigne.io - the DocSmith documentation site
+  productContext:
+    tagline: "AI-Native DocOps Platform - Documentation as accelerator, not burden"
+    category: "B2B Tool"
+    site: "docsmith.aigne.io"
+    goal: "Living documentation that evolves with code, drives organic traffic through SEO"
+    position: "DocSmith is the AI-native documentation platform. This site showcases capabilities and drives leads."
+    keyFeatures:
+      - "Agentic Source Analysis"
+      - "Multi-format output (docs, PDFs, presentations)"
+      - "12-language localization"
+      - "Source-driven updates"
+      - "Workspace isolation"
+    strategicFocus: |
+      AIGNE/DocSmith site is our SEO growth engine.
+      Daily content tasks add pages that compound organic traffic over time.
+      Success = growing organic traffic that demonstrates DocSmith's content capabilities.
+
+  # Report configuration
+  reportPeriod:
+    current: 7        # Last 7 days
+    comparison: 7     # Previous 7 days
+    trend: 90         # 90-day view for growth trajectory
+
+  # Focus areas for AIGNE
+  focus:
+    - organic_search_growth    # Track SEO impact from daily content
+    - content_performance      # Which pages drive traffic
+    - traffic_trajectory       # 90-day growth trend
+
+  # Metrics to track
+  metrics:
+    core:
+      - activeUsers
+      - newUsers
+      - sessions
+      - screenPageViews
+      - eventCount
+    engagement:
+      - userEngagementDuration
+      - engagedSessions
+      - engagementRate
+      - sessionsPerUser
+      - screenPageViewsPerSession
+      - bounceRate
+    retention:
+      - dauPerMau
+      - dauPerWau
+      - wauPerMau
+    # SEO-specific metrics
+    acquisition:
+      - organicGoogleSearchClicks
+      - organicGoogleSearchImpressions
+      - organicGoogleSearchClickThroughRate
+
+  # Dimensions for breakdown
+  dimensions:
+    traffic:
+      - sessionSource
+      - sessionMedium
+      - sessionDefaultChannelGroup
+    content:
+      - pagePath
+      - pageTitle
+      - landingPage
+    geo:
+      - country
+
+  # Thresholds for alerts/red flags
+  thresholds:
+    significantChange: 15
+    retentionWarning: 10
+    engagementWarning: 30
+    organicGrowthTarget: 10    # Want 10%+ organic growth week-over-week
+
+  # Output configuration
+  output:
+    format: "html"
+    deployToMyVibe: true
+    myVibeVisibility: "private"
+
+  # Notification
+  notification:
+    email: true
+    subject: "AIGNE Weekly Analytics - {date}"
+
+# Dependencies
+dependencies: []
+
+# Output destinations
+outputs:
+  reports: "./reports/analytics/aigne/"
+  logs: "./logs/"

@@ -74,6 +74,28 @@ tasks:
     dailyLimit: 1
     weeklyLimit: 1
 
+  # ═══════════════════════════════════════════════════════════════
+  # GOOGLE ANALYTICS WEEKLY REPORTS (Thursdays)
+  # ═══════════════════════════════════════════════════════════════
+
+  # ArcSphere Analytics - Weekly performance dashboard
+  analytics-arcsphere-weekly:
+    enabled: true  # Created 2026-01-29
+    category: analytics
+    description: "Weekly GA4 analytics report for ArcSphere - installs, retention, DAU/WAU/MAU"
+    schedule: "0 7 * * 4"  # Thursday 7 AM PST
+    dailyLimit: 1
+    weeklyLimit: 1
+
+  # AIGNE Analytics - Weekly performance dashboard
+  analytics-aigne-weekly:
+    enabled: true  # Created 2026-01-29
+    category: analytics
+    description: "Weekly GA4 analytics report for AIGNE - engagement, traffic, conversions"
+    schedule: "15 7 * * 4"  # Thursday 7:15 AM PST (staggered)
+    dailyLimit: 1
+    weeklyLimit: 1
+
   # Future tasks (disabled for now)
   # social-posts:
   #   enabled: false

@@ -7,9 +7,25 @@
  * Can be triggered by launchd or run manually.
  */
 
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+// Load .env file if it exists
+const __dirnameInit = dirname(fileURLToPath(import.meta.url));
+const envPath = join(__dirnameInit, '..', '.env');
+if (existsSync(envPath)) {
+  const envContent = readFileSync(envPath, 'utf8');
+  for (const line of envContent.split('\n')) {
+    const trimmed = line.trim();
+    if (trimmed && !trimmed.startsWith('#')) {
+      const [key, ...valueParts] = trimmed.split('=');
+      if (key && valueParts.length > 0) {
+        process.env[key.trim()] = valueParts.join('=').trim();
+      }
+    }
+  }
+}
 import { parse as parseYaml } from 'yaml';
 
 import logger from './shared/logger.mjs';

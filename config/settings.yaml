@@ -17,13 +17,21 @@ qualityReview:
   enabled: true
   minScore: 6
 
-# Notifications (optional)
+# Notifications
 notifications:
-  enabled: false
+  enabled: true
+  email:
+    enabled: true
+    to: "matt@arcblock.io"
+    from: "Content Automation <matt@arcblock.io>"
+    smtp:
+      host: "smtp.gmail.com"
+      port: 587
+      user: ""  # Add your Gmail address
+      password: ""  # Add your Gmail App Password
   # slack:
+  #   enabled: false
   #   webhook: "https://hooks.slack.com/..."
-  # email:
-  #   to: "you@example.com"
 
 # Credential paths (relative to credentials/)
 credentials:

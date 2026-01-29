@@ -1,0 +1,126 @@
+# Google Analytics Weekly Report - ArcSphere
+# Focus on conversion, engagement, retention since Google Ads launch (Dec 23, 2025)
+# Every Thursday at 7am PST
+
+name: analytics-arcsphere-weekly
+description: "Weekly Google Analytics report for ArcSphere - conversion funnel health since Google Ads launch"
+version: "2.0.0"
+
+category: analytics
+
+# Run Thursday at 7 AM PST (America/Los_Angeles)
+schedule: "0 7 * * 4"
+
+# Limits
+dailyLimit: 1
+weeklyLimit: 1
+maxRetries: 2
+timeoutMinutes: 30
+
+# Task-specific settings
+settings:
+  # Google Analytics property
+  propertyId: "455964911"
+  propertyName: "ArcSphere"
+
+  # Product Context (from CLAUDE.md)
+  productContext:
+    tagline: "Your real-time window into the AI-enabled internet"
+    category: "WOW Product (Consumer)"
+    platforms: "iOS, Android"
+    goal: "First mobile app with instant access to Agent Fleets and Skills"
+    position: "Consumption layer - where users experience the AI-enabled internet"
+    keyFeatures:
+      - "Agent Fleet Access (coming)"
+      - "Skill Browser"
+      - "Action Ring"
+      - "Spatial Tab Navigation"
+      - "AI Chat"
+      - "Digital Passport (DID)"
+    strategicFocus: |
+      ArcSphere is the consumption layer for the ArcBlock ecosystem.
+      Current priority: Prove retention before scaling acquisition.
+      Q1 2026: Agent Fleet integration is the key unlock.
+
+  # Report configuration
+  reportPeriod:
+    current: 7        # Last 7 days
+    comparison: 7     # Previous 7 days
+    # Track from Google Ads launch date
+    baseline: "2025-12-23"   # Google Ads campaign started
+
+  # Key focus areas - the 3 pillars that must all work
+  focus:
+    pillars:
+      - conversion      # Are we converting traffic to installs?
+      - engagement      # Are users engaging with the app?
+      - retention       # Are users coming back?
+
+    # Key moments to annotate
+    annotations:
+      - date: "2025-12-23"
+        event: "Google Ads Campaign Launch"
+        type: "positive"
+      - date: "2026-01-20"
+        event: "Reduced Google Ads Spend"
+        type: "negative"
+
+  # Metrics to track
+  metrics:
+    # Conversion metrics
+    conversion:
+      - activeUsers
+      - newUsers
+      - sessions
+      - conversions
+      - firstTimePurchasers
+    # Engagement metrics
+    engagement:
+      - userEngagementDuration
+      - engagedSessions
+      - engagementRate
+      - sessionsPerUser
+      - screenPageViewsPerSession
+      - averageSessionDuration
+    # Retention metrics
+    retention:
+      - dauPerMau
+      - dauPerWau
+      - wauPerMau
+      - userRetention  # Day 1, 7, 30 if available
+
+  # Dimensions for breakdown
+  dimensions:
+    - date
+    - platform
+    - operatingSystem
+    - deviceCategory
+    - sessionSource
+    - sessionMedium
+
+  # Thresholds for alerts/red flags
+  thresholds:
+    significantChange: 15
+    # Minimum healthy levels
+    retentionWarning: 10           # DAU/MAU below 10% is critical
+    engagementWarning: 40          # Engagement rate below 40% needs attention
+    conversionWarning: 2           # Conversion rate below 2% is concerning
+
+  # Output configuration
+  output:
+    format: "html"
+    deployToMyVibe: true
+    myVibeVisibility: "private"
+
+  # Notification
+  notification:
+    email: true
+    subject: "ArcSphere Weekly Analytics - {date}"
+
+# Dependencies
+dependencies: []
+
+# Output destinations
+outputs:
+  reports: "./reports/analytics/arcsphere/"
+  logs: "./logs/"
